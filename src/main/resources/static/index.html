@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InterviewPrep Pro</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252545;
+            --text: #f0f0ff;
+            --text-sec: #c4c4e0;
+            --text-muted: #7878a0;
+            --accent: #818cf8;
+            --accent-light: #312e81;
+            --pink: #f472b6;
+            --teal: #2dd4bf;
+            --amber: #fbbf24;
+            --emerald: #34d399;
+            --red: #fb7185;
+            --border: #2d2d50;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 {
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .back-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .header .back-btn.visible { display: block; }
+
+        /* ===== Search ===== */
+        .search-bar {
+            padding: 10px 16px;
+            background: var(--bg);
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-bar input:focus {
+            border-color: var(--accent);
+        }
+        .search-bar input::placeholder { color: var(--text-muted); }
+
+        /* ===== Section List (home) ===== */
+        .home-view, .topics-view, .topic-detail { padding: 16px; }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .section-card:active { transform: scale(0.98); }
+        .section-card:nth-child(2) { border-left-color: var(--pink); }
+        .section-card h3 { font-size: 16px; margin-bottom: 6px; }
+        .section-card p { font-size: 13px; color: var(--text-muted); }
+        .section-card .count {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* ===== Topic List ===== */
+        .topic-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .topic-item:active { transform: scale(0.98); }
+        .topic-item .diff-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .topic-item .diff-dot.beginner { background: var(--emerald); }
+        .topic-item .diff-dot.intermediate { background: var(--amber); }
+        .topic-item .diff-dot.advanced { background: var(--red); }
+        .topic-item .title { font-size: 14px; font-weight: 600; }
+        .topic-item .cat { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== Topic Detail ===== */
+        .topic-detail h2 {
+            font-size: 20px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .gradient-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(to right, #6366f1, #8b5cf6, #ec4899, #f59e0b, #10b981);
+            margin-bottom: 12px;
+        }
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .badge {
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid;
+        }
+        .badge.beginner { color: var(--emerald); border-color: var(--emerald); background: #05261540; }
+        .badge.intermediate { color: var(--amber); border-color: var(--amber); background: #78350f30; }
+        .badge.advanced { color: var(--red); border-color: var(--red); background: #4c000030; }
+        .badge.category { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
+
+        /* Collapsible sections */
+        .section-block {
+            margin-bottom: 10px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+        .section-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            border-left: 4px solid var(--accent);
+            transition: background 0.15s;
+            user-select: none;
+        }
+        .section-header:active { background: var(--bg-hover); }
+        .section-header .arrow {
+            transition: transform 0.2s;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .section-header.open .arrow { transform: rotate(180deg); }
+        .section-body {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        .section-body.open {
+            padding: 12px 16px;
+            max-height: 5000px;
+        }
+        .section-body pre {
+            background: #f8fafc;
+            color: #1e293b;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            overflow-x: auto;
+            line-height: 1.5;
+            font-family: 'Consolas', 'Courier New', monospace;
+            -webkit-overflow-scrolling: touch;
+        }
+        .section-body p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-sec);
+            white-space: pre-wrap;
+        }
+        .section-body ul {
+            padding-left: 20px;
+            list-style: none;
+        }
+        .section-body ul li {
+            font-size: 13px;
+            color: var(--text-sec);
+            padding: 4px 0;
+            line-height: 1.5;
+        }
+        .section-body ul li::before {
+            content: "•";
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .section-body ol {
+            padding-left: 20px;
+        }
+        .section-body ol li {
+            font-size: 13px;
+            color: var(--text-sec);
+            padding: 4px 0;
+            line-height: 1.5;
+        }
+
+        /* Section color variety */
+        .section-block:nth-child(6n+1) .section-header { border-left-color: #6366f1; color: #6366f1; }
+        .section-block:nth-child(6n+2) .section-header { border-left-color: #8b5cf6; color: #8b5cf6; }
+        .section-block:nth-child(6n+3) .section-header { border-left-color: #0ea5e9; color: #0ea5e9; }
+        .section-block:nth-child(6n+4) .section-header { border-left-color: #10b981; color: #10b981; }
+        .section-block:nth-child(6n+5) .section-header { border-left-color: #f59e0b; color: #f59e0b; }
+        .section-block:nth-child(6n+6) .section-header { border-left-color: #ec4899; color: #ec4899; }
+
+        /* Special sections */
+        .interview-section .section-header { border-left-color: #7c3aed; color: #7c3aed; background: #1e1b4b; }
+        .revision-section .section-header { border-left-color: #16a34a; color: #16a34a; background: #052e16; }
+        .interview-section .section-body p { color: #a5b4fc; }
+        .revision-section .section-body p { color: #6ee7b7; font-weight: 600; }
+
+        /* View management */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* TTS bar */
+        .tts-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .tts-bar select {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        .tts-bar button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .tts-bar .play-btn { background: var(--emerald); color: white; }
+        .tts-bar .stop-btn { background: var(--red); color: white; }
+        .tts-bar .status { font-size: 11px; color: var(--text-muted); }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .home-view, .topics-view, .topic-detail { max-width: 700px; margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn" onclick="goBack()">&#8592;</button>
+    <h1>📚 InterviewPrep Pro</h1>
+</div>
+
+<!-- Search -->
+<div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search topics..." oninput="handleSearch(this.value)">
+</div>
+
+<!-- Home View -->
+<div class="view active" id="homeView">
+    <div class="home-view" id="sectionList"></div>
+</div>
+
+<!-- Topics View -->
+<div class="view" id="topicsView">
+    <div class="topics-view" id="topicList"></div>
+</div>
+
+<!-- Topic Detail View -->
+<div class="view" id="detailView">
+    <div class="topic-detail" id="topicDetail"></div>
+</div>
+
+<script>
+    let allData = {};
+    let currentView = 'home';
+    let currentSection = '';
+    let speechSynth = window.speechSynthesis;
+    let speaking = false;
+
+    // ===== Data Loading =====
+    async function loadData() {
+        const res = await fetch('/api/all');
+        allData = await res.json();
+        renderHome();
+    }
+
+    // ===== Views =====
+    function showView(view) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(view + 'View').classList.add('active');
+        currentView = view;
+        document.getElementById('backBtn').classList.toggle('visible', view !== 'home');
+    }
+
+    function goBack() {
+        if (currentView === 'detail') showView('topics');
+        else if (currentView === 'topics') showView('home');
+    }
+
+    // ===== Home =====
+    function renderHome() {
+        const el = document.getElementById('sectionList');
+        const icons = { 'Core Java': '☕', 'Advanced Java': '🚀' };
+        el.innerHTML = Object.entries(allData).map(([name, topics]) => `
+            <div class="section-card fade-in" onclick="openSection('${name}')">
+                <h3>${icons[name] || '📖'} ${name}</h3>
+                <p>${topics.length} in-depth modules covering definitions, internals, code examples, interview answers & more</p>
+                <span class="count">${topics.length} topics</span>
+            </div>
+        `).join('');
+    }
+
+    // ===== Topic List =====
+    function openSection(section) {
+        currentSection = section;
+        renderTopicList(allData[section]);
+        showView('topics');
+    }
+
+    function renderTopicList(topics) {
+        const el = document.getElementById('topicList');
+        el.innerHTML = topics.map((t, i) => `
+            <div class="topic-item fade-in" style="animation-delay:${i*30}ms" onclick="openTopic('${currentSection}', ${i})">
+                <div class="diff-dot ${(t.difficulty||'').toLowerCase()}"></div>
+                <div>
+                    <div class="title">${t.title}</div>
+                    <div class="cat">${t.category} • ${t.difficulty || 'Intermediate'}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ===== Topic Detail =====
+    function openTopic(section, index) {
+        const topic = allData[section][index];
+        renderDetail(topic);
+        showView('detail');
+    }
+
+    function renderDetail(t) {
+        const el = document.getElementById('topicDetail');
+
+        const sections = [
+            { icon: '📖', title: 'Definition', content: t.definition, type: 'text' },
+            { icon: '🎯', title: 'Why It Matters', content: t.whyItMatters, type: 'text' },
+            { icon: '⚙️', title: 'How It Works', content: t.howItWorks, type: 'text' },
+            { icon: '🔧', title: 'Internal Working', content: t.internalWorking, type: 'text' },
+            { icon: '📝', title: 'Syntax', content: t.syntax, type: 'code' },
+            { icon: '💻', title: 'Code Examples', content: t.codeExample, type: 'code' },
+            { icon: '🌍', title: 'Real-World Application', content: t.realWorldExample, type: 'text' },
+            { icon: '✅', title: 'Advantages', content: t.advantages, type: 'list' },
+            { icon: '⚠️', title: 'Disadvantages', content: t.disadvantages, type: 'list' },
+            { icon: '✔️', title: 'When to Use', content: t.whenToUse, type: 'text' },
+            { icon: '❌', title: 'When Not to Use', content: t.whenNotToUse, type: 'text' },
+            { icon: '🚫', title: 'Common Mistakes', content: t.commonMistakes, type: 'list' },
+            { icon: '🌟', title: 'Interview-Ready Answer', content: t.interviewAnswer, type: 'text', special: 'interview' },
+            { icon: '❓', title: 'Follow-Up Questions', content: t.followUpQuestions, type: 'olist' },
+            { icon: '🎭', title: 'Scenario Questions', content: t.scenarioQuestions, type: 'olist' },
+            { icon: '⚡', title: 'Quick Revision', content: t.quickRevision, type: 'text', special: 'revision' },
+        ];
+
+        let html = `
+            <h2 class="fade-in">${t.title}</h2>
+            <div class="gradient-bar"></div>
+            <div class="badge-row">
+                ${t.category ? `<span class="badge category">${t.category}</span>` : ''}
+                ${t.difficulty ? `<span class="badge ${(t.difficulty||'').toLowerCase()}">${t.difficulty}</span>` : ''}
+            </div>
+            <div class="tts-bar">
+                <span>🔊</span>
+                <select id="ttsSection">
+                    <option value="full">Full Topic</option>
+                    <option value="definition">Definition</option>
+                    <option value="interviewAnswer">Interview Answer</option>
+                    <option value="quickRevision">Quick Revision</option>
+                </select>
+                <button class="play-btn" onclick="speakTopic(this)">▶ Read</button>
+                <button class="stop-btn" onclick="stopSpeech()">⏹ Stop</button>
+                <span class="status" id="ttsStatus">Ready</span>
+            </div>
+        `;
+
+        sections.forEach((s, i) => {
+            if (!s.content || (Array.isArray(s.content) && s.content.length === 0)) return;
+            const openClass = i < 2 ? 'open' : '';
+            const specialClass = s.special === 'interview' ? 'interview-section' : s.special === 'revision' ? 'revision-section' : '';
+
+            let bodyHTML = '';
+            if (s.type === 'code') {
+                bodyHTML = `<pre>${escapeHtml(s.content)}</pre>`;
+            } else if (s.type === 'list') {
+                bodyHTML = `<ul>${s.content.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+            } else if (s.type === 'olist') {
+                bodyHTML = `<ol>${s.content.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`;
+            } else {
+                bodyHTML = `<p>${escapeHtml(s.content)}</p>`;
+            }
+
+            html += `
+                <div class="section-block ${specialClass} fade-in" style="animation-delay:${i*40}ms">
+                    <div class="section-header ${openClass}" onclick="toggleSection(this)">
+                        <span>${s.icon} ${s.title}</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="section-body ${openClass}">${bodyHTML}</div>
+                </div>
+            `;
+        });
+
+        el.innerHTML = html;
+        el.scrollTop = 0;
+        window.scrollTo(0, 0);
+    }
+
+    // ===== Collapsible =====
+    function toggleSection(header) {
+        header.classList.toggle('open');
+        header.nextElementSibling.classList.toggle('open');
+    }
+
+    // ===== Search =====
+    function handleSearch(query) {
+        query = query.toLowerCase().trim();
+        if (!query) {
+            renderHome();
+            showView('home');
+            return;
+        }
+        // Search across all topics
+        let results = [];
+        Object.entries(allData).forEach(([section, topics]) => {
+            topics.forEach((t, i) => {
+                const searchable = (t.title + ' ' + (t.definition||'') + ' ' + (t.quickRevision||'')).toLowerCase();
+                if (searchable.includes(query)) {
+                    results.push({ topic: t, section, index: i });
+                }
+            });
+        });
+
+        const el = document.getElementById('topicList');
+        if (results.length === 0) {
+            el.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:40px;">No results for "${query}"</p>`;
+        } else {
+            el.innerHTML = results.map((r, i) => `
+                <div class="topic-item fade-in" style="animation-delay:${i*30}ms" onclick="openTopic('${r.section}', ${r.index})">
+                    <div class="diff-dot ${(r.topic.difficulty||'').toLowerCase()}"></div>
+                    <div>
+                        <div class="title">${r.topic.title}</div>
+                        <div class="cat">${r.topic.category} • ${r.topic.difficulty || ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        showView('topics');
+    }
+
+    // ===== Text-to-Speech (Web Speech API - works on mobile!) =====
+    function speakTopic(btn) {
+        stopSpeech();
+        const topic = getCurrentTopic();
+        if (!topic) return;
+
+        const section = document.getElementById('ttsSection').value;
+        let text = '';
+        if (section === 'full') {
+            text = [topic.title, topic.definition, topic.whyItMatters, topic.howItWorks, topic.interviewAnswer, topic.quickRevision]
+                .filter(Boolean).join('. ');
+        } else {
+            text = topic[section] || '';
+        }
+        if (!text) return;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1;
+        utterance.onstart = () => { document.getElementById('ttsStatus').textContent = '🔊 Speaking...'; speaking = true; };
+        utterance.onend = () => { document.getElementById('ttsStatus').textContent = '✅ Done'; speaking = false; };
+        utterance.onerror = () => { document.getElementById('ttsStatus').textContent = 'Ready'; speaking = false; };
+        speechSynth.speak(utterance);
+    }
+
+    function stopSpeech() {
+        speechSynth.cancel();
+        speaking = false;
+        const el = document.getElementById('ttsStatus');
+        if (el) el.textContent = 'Ready';
+    }
+
+    function getCurrentTopic() {
+        // Find the currently displayed topic from the detail view title
+        const titleEl = document.querySelector('#topicDetail h2');
+        if (!titleEl) return null;
+        const title = titleEl.textContent;
+        for (const topics of Object.values(allData)) {
+            const found = topics.find(t => t.title === title);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    // ===== Util =====
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ===== Init =====
+    loadData();
+</script>
+</body>
+</html>
