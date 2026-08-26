@@ -272,6 +272,62 @@
         .fade-in { animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Lock Screen */
+        .lock-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .lock-screen.hidden { display: none; }
+        .lock-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            width: 90%;
+            max-width: 340px;
+            text-align: center;
+        }
+        .lock-box .lock-icon { font-size: 48px; margin-bottom: 16px; }
+        .lock-box h2 {
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .lock-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .lock-box input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+        .lock-box input:focus { border-color: var(--accent); }
+        .lock-box button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .lock-box .error-msg { color: var(--red); font-size: 12px; margin-top: 10px; }
+
         /* TTS bar */
         .tts-bar {
             display: flex;
@@ -311,6 +367,19 @@
     </style>
 </head>
 <body>
+
+<!-- Lock Screen -->
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-box">
+        <div class="lock-icon">🔐</div>
+        <h2>InterviewPrep Pro</h2>
+        <p>Enter the secret to access your study material</p>
+        <input type="password" id="secretInput" placeholder="••••••" autocomplete="off" 
+               onkeydown="if(event.key==='Enter') unlock()">
+        <button onclick="unlock()">Unlock</button>
+        <div class="error-msg" id="lockError"></div>
+    </div>
+</div>
 
 <!-- Header -->
 <div class="header">
@@ -571,8 +640,41 @@
         return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
+    // ===== Auth =====
+    async function checkAuth() {
+        try {
+            const res = await fetch('/api/auth/check');
+            const data = await res.json();
+            if (data.authenticated) {
+                document.getElementById('lockScreen').classList.add('hidden');
+                loadData();
+            }
+        } catch(e) { /* not authenticated */ }
+    }
+
+    async function unlock() {
+        const secret = document.getElementById('secretInput').value;
+        const errEl = document.getElementById('lockError');
+        if (!secret) { errEl.textContent = 'Please enter the secret'; return; }
+
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret })
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('lockScreen').classList.add('hidden');
+            loadData();
+        } else {
+            errEl.textContent = 'Wrong secret. Try again.';
+            document.getElementById('secretInput').value = '';
+            document.getElementById('secretInput').focus();
+        }
+    }
+
     // ===== Init =====
-    loadData();
+    checkAuth();
 </script>
 </body>
 </html>
